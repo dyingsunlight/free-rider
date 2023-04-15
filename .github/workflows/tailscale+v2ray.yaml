@@ -20,7 +20,7 @@ jobs:
       - name: Start Tailscale
         timeout-minutes: 60
         env:
-          $TAILSCALE_TOKEN: ${{ secrets.$TAILSCALE_TOKEN }}
+          TAILSCALE_TOKEN: ${{ secrets.TAILSCALE_TOKEN }}
           V2RAY_CONFIG: ${{ secrets.V2RAY_CONFIG }}
         run: |
           sudo tailscale login --authkey=$TAILSCALE_TOKEN
