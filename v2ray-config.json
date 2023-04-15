@@ -1,0 +1,20 @@
+{
+  "inbounds": [
+    {
+      "port": 10086,
+      "protocol": "vmess",
+      "settings": {
+        "clients": [
+          {
+            "id": "YOUR UUID"
+          }
+        ]
+      }
+    }
+  ],
+  "outbounds": [
+    {
+      "protocol": "freedom"
+    }
+  ]
+}

@@ -1,0 +1,36 @@
+name: Tailscale+V2ray
+
+on:
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Install Tailscale
+        run: |
+          curl -fsSL https://pkgs.tailscale.com/stable/ubuntu/focal.gpg | sudo apt-key add -
+          curl -fsSL https://pkgs.tailscale.com/stable/ubuntu/focal.list | sudo tee /etc/apt/sources.list.d/tailscale.list
+          sudo apt-get update
+          sudo apt-get install tailscale
+
+      - name: Start Tailscale
+        timeout-minutes: 60
+        env:
+          TAILSCALE: ${{ secrets.TAILSCALE }}
+          V2RAY_CONFIG: ${{ secrets.V2RAY_CONFIG }}
+        run: |
+          sudo tailscale login --authkey=$TAILSCALE_TOKEN
+          sudo tailscale up
+          sudo tailscale set --hostname="github-v2ray-server"
+          echo $V2RAY_CONFIG >> v2ray-config.json
+          docker run --network=host --name v2ray -v ${{ github.workspace }}/v2ray-config.json:/etc/v2fly/config.json -p 10086:10086 v2fly/v2fly-core run -c /etc/v2fly/config.json
+
+      - name: Immediately Cleanup
+        if: always()
+        run: |
+          echo "Immediately Cleanup"
+          sudo tailscale logout
