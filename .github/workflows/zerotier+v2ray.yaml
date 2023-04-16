@@ -1,4 +1,4 @@
-name: Tailscale+V2ray
+name: ZeroTier+V2ray
 
 on:
   workflow_dispatch:
@@ -17,11 +17,13 @@ jobs:
       - name: Start ZeroTier
         timeout-minutes: 60
         env:
-          ZEROTIER_NETWORK: ${{ secrets.ZEROTIER_NETWORK }}
+          ZEROTIER_NETWORK_ID: ${{ secrets.ZEROTIER_NETWORK_ID }}
+          ZEROTIER_TOKEN: ${{ secrets.ZEROTIER_TOKEN }}
           V2RAY_CONFIG_JSON: ${{ secrets.V2RAY_CONFIG_JSON }}
         run: |
           memberId=$(zerotier-cli info | awk -F" " '{print $3}')
-          curl -X POST -H "Content-Type: application/json" -d '{"config": { "ipAssignments": [ "10.10.10.200" ] }}' https://api.zerotier.com/api/v1/network/${ZEROTIER_NETWORK_ID}/member/${me  mberId}
+          echo "Member Id is ${memberId}"
+          curl -X POST -H "Content-Type: application/json" -H "Authorization: token ${ZEROTIER_TOKEN}" -d '{"config": { "ipAssignments": [ "10.10.10.200" ] }}' https://api.zerotier.com/api/v1/network/${ZEROTIER_NETWORK_ID}/member/${memberId}
           zerotier-cli join ${ZEROTIER_NETWORK_ID}
           echo $V2RAY_CONFIG_JSON > v2ray-runtime-config.json
           docker run --network=host --name v2ray -v ${{ github.workspace }}/v2ray-runtime-config.json:/etc/v2fly/config.json -p 10086:10086 v2fly/v2fly-core run -c /etc/v2fly/config.json
