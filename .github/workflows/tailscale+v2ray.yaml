@@ -18,16 +18,17 @@ jobs:
           sudo apt-get install tailscale
 
       - name: Start Tailscale
-        timeout-minutes: 60
         env:
           TAILSCALE_TOKEN: ${{ secrets.TAILSCALE_TOKEN }}
-          V2RAY_CONFIG_JSON: ${{ secrets.V2RAY_CONFIG_JSON }}
         run: |
           sudo tailscale login --authkey=$TAILSCALE_TOKEN
           sudo tailscale up
           sudo tailscale set --hostname="github-v2ray-server"
 
       - name: Start V2ray
+        timeout-minutes: 60
+        env:
+          V2RAY_CONFIG_JSON: ${{ secrets.V2RAY_CONFIG_JSON }}
         run: |
           echo $V2RAY_CONFIG_JSON > v2ray-runtime-config.json
           docker run --network=host --name v2ray -v ${{ github.workspace }}/v2ray-runtime-config.json:/etc/v2fly/config.json -p 10086:10086 v2fly/v2fly-core run -c /etc/v2fly/config.json

@@ -16,11 +16,9 @@ jobs:
           sudo zerotier-cli info
 
       - name: Start ZeroTier
-        timeout-minutes: 60
         env:
           ZEROTIER_NETWORK_ID: ${{ secrets.ZEROTIER_NETWORK_ID }}
           ZEROTIER_TOKEN: ${{ secrets.ZEROTIER_TOKEN }}
-          V2RAY_CONFIG_JSON: ${{ secrets.V2RAY_CONFIG_JSON }}
         run: |
           memberId=$(sudo zerotier-cli info | awk -F" " '{print $3}')
           echo "Member Id is ${memberId}"
@@ -28,6 +26,18 @@ jobs:
           sudo zerotier-cli join ${ZEROTIER_NETWORK_ID}
 
       - name: Start V2ray
+        timeout-minutes: 60
+        env:
+          V2RAY_CONFIG_JSON: ${{ secrets.V2RAY_CONFIG_JSON }}
         run: |
           echo $V2RAY_CONFIG_JSON > v2ray-runtime-config.json
           docker run --network=host --name v2ray -v ${{ github.workspace }}/v2ray-runtime-config.json:/etc/v2fly/config.json -p 10086:10086 v2fly/v2fly-core run -c /etc/v2fly/config.json
+
+      - name: Immediately Cleanup
+        if: always()
+        env:
+          ZEROTIER_NETWORK_ID: ${{ secrets.ZEROTIER_NETWORK_ID }}
+          ZEROTIER_TOKEN: ${{ secrets.ZEROTIER_TOKEN }}
+        run: |
+          memberId=$(sudo zerotier-cli info | awk -F" " '{print $3}')
+          curl -X DELETE -H "Authorization: token ${ZEROTIER_TOKEN}" https://api.zerotier.com/api/v1/network/${ZEROTIER_NETWORK_ID}/member/${memberId}
