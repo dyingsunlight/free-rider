@@ -1,7 +1,14 @@
 name: Tailscale+V2ray
 
+# 注意事项：
+# 1. 应当指定每个任务的持续时间和开始时间，例如设置 schedule.cron 属性让任务每个小时自动运行一次，每次运行时间 60分钟 （由 "Start V2ray" 中的 timeout-minutes 指定）
+# 2. 应当确保 IP_ASSIGNMENT
+
 on:
   workflow_dispatch:
+  # 取消注释以启用定时任务（默认每小时），具体生成可参考 https://www.freeformatter.com/cron-expression-generator-quartz.html
+  # schedule:
+  #  - cron: "0 0 * ? * *"
 
 jobs:
   deploy:
@@ -19,13 +26,16 @@ jobs:
 
       - name: Start Tailscale
         env:
+          # 如果修改了 IP_ASSIGNMENT，那么对于 clash 配置的服务器地址也应当同步。
+          IP_ASSIGNMENT: 10.144.254.254
           TAILSCALE_TOKEN: ${{ secrets.TAILSCALE_TOKEN }}
         run: |
           sudo tailscale login --authkey=$TAILSCALE_TOKEN
           sudo tailscale up
-          sudo tailscale set --hostname="github-v2ray-server"
+          sudo tailscale set --hostname="$IP_ASSIGNMENT"
 
       - name: Start V2ray
+        # 每次运行时间 60分钟
         timeout-minutes: 60
         env:
           V2RAY_CONFIG_JSON: ${{ secrets.V2RAY_CONFIG_JSON }}

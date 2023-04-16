@@ -9,11 +9,11 @@ experimental:
 proxies:
   - name: Github Actions V2Ray
     type: vmess
-    server: github-v2ray-server
+    server: 10.144.254.254
     port: 10086
     alterId: 0
     cipher: auto
-    uuid: YOUR UUID
+    uuid: $UUID$
 
 proxy-groups:
   - name: PROXY

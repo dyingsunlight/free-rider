@@ -6,7 +6,7 @@
       "settings": {
         "clients": [
           {
-            "id": "YOUR UUID"
+            "id": "$UUID$"
           }
         ]
       }
