@@ -25,6 +25,7 @@ jobs:
           echo "Member Id is ${memberId}"
           curl -X POST -H "Content-Type: application/json" -H "Authorization: token ${ZEROTIER_TOKEN}" -d '{"config": { "ipAssignments": [ "192.168.100.254" ] }}' https://api.zerotier.com/api/v1/network/${ZEROTIER_NETWORK_ID}/member/${memberId}
           sudo zerotier-cli join ${ZEROTIER_NETWORK_ID}
+          sleep 5
           sudo zerotier-cli info
           sudo zerotier-cli listpeers
           ip addr show
