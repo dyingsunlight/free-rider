@@ -30,8 +30,11 @@
 6. 编辑 `.github/workflows/zerotier+v2ray.yaml` 的 [Workflows 模板](.github/workflows/zerotier+v2ray.yaml)，
    - 修改模板，设定 `cron` 计划任务和 `timeout-minutes`
    - 可选，可以额外指定 `IP_ASSIGNMENT`，请注意这是服务器的地址
-7. 提交 `zerotier+v2ray.yaml` workflows 文件，检查运行状态是否正常（简单的 ping `IP_ASSIGNMENT` 检查响应结果）
-8. 打开 `ZeroTier` 桌面端
+7. 打开 `ZeroTier` 桌面端, 加入 `ZeroTier Netowrk Id` 并且在该网络设置中
+   - 启用 `Allow Assignment of Global IPs`
+   - 启用 `Allow Default Router Override`
+   - 启用 `Allow DNS Configuration`
+8. 提交 `zerotier+v2ray.yaml` workflows 文件，检查运行状态是否正常（简单的 ping `IP_ASSIGNMENT` 检查响应结果）
 9. 配置客户端 clash 文件，这是一个 [简单的模板](clash.template.yaml)，需要填入之前的 `$UUID$`，如果服务器地址有修改那么对于的 `server` 字段也应该使用。
  
 ### Tailscale
